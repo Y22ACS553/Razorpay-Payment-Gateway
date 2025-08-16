@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pay Now</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+  <script>
+    const order_id = new URLSearchParams(window.location.search).get('order_id');
+
+    var options = {
+        "key": "rzp_test_R5CQyvERFSfKAl",
+        "order_id": order_id,
+        "handler": function(response){
+            // Display payment ID for testing
+            document.body.innerHTML = "<h3>Payment Successful!</h3><p>Payment ID: " + response.razorpay_payment_id + "</p>";
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+  </script>
+<p>Redirecting to payment...</p>
+</body>
+</html>
