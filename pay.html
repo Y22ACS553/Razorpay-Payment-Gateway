@@ -1,25 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pay Now</title>
+  <title>Razorpay Payment</title>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
   <script>
-    const order_id = new URLSearchParams(window.location.search).get('order_id');
+    // Get query params from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get("order_id");
+    const amount = urlParams.get("amount");
+    const customerName = urlParams.get("customer_name") || "Customer";
+    const customerEmail = urlParams.get("customer_email") || "test@example.com";
+    const customerContact = urlParams.get("customer_contact") || "9999999999";
 
     var options = {
-        "key": "rzp_test_R5CQyvERFSfKAl",
-        "order_id": order_id,
-        "handler": function(response){
-            // Display payment ID for testing
-            document.body.innerHTML = "<h3>Payment Successful!</h3><p>Payment ID: " + response.razorpay_payment_id + "</p>";
-        }
+      "key": "rzp_test_R5CQyvERFSfKAl", // replace with your Razorpay Key
+      "amount": amount * 100,    // amount in paise
+      "currency": "INR",
+      "name": "My Company",
+      "description": "Test Transaction",
+      "order_id": orderId,
+      "handler": function (response){
+          alert("Payment ID: " + response.razorpay_payment_id);
+          alert("Order ID: " + response.razorpay_order_id);
+          alert("Signature: " + response.razorpay_signature);
+          // Here you can redirect to success page if needed
+      },
+      "prefill": {
+          "name": customerName,
+          "email": customerEmail,
+          "contact": customerContact
+      },
+      "theme": {
+          "color": "#3399cc"
+      }
     };
 
-    var rzp = new Razorpay(options);
-    rzp.open();
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
   </script>
-<p>Redirecting to payment...</p>
 </body>
 </html>
