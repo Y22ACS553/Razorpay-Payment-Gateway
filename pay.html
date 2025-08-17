@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Razorpay Payment</title>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <title>Razorpay Payment</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
-  <script>
-    // Get query params from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get("order_id");
-    const amount = urlParams.get("amount");
-    const customerName = urlParams.get("customer_name") || "Customer";
-    const customerEmail = urlParams.get("customer_email") || "test@example.com";
-    const customerContact = urlParams.get("customer_contact") || "9999999999";
+  <script>
+    // Get query params from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get("order_id");
+    const amount = urlParams.get("amount");
+    const customerName = urlParams.get("customer_name") || "Customer";
+    const customerEmail = urlParams.get("customer_email") || "test@example.com";
+    const customerContact = urlParams.get("customer_contact") || "9999999999";
 
-    var options = {
-      "key": "rzp_test_R5CQyvERFSfKAl", // replace with your Razorpay Key
-      "amount": amount * 100,    // amount in paise
-      "currency": "INR",
-      "name": "True Vehicle",
-      "description": "Vehicle Purchase Transaction",
-      "order_id": orderId,
-      "handler": function (response){
-          alert("Payment ID: " + response.razorpay_payment_id);
-          alert("Order ID: " + response.razorpay_order_id);
-          alert("Signature: " + response.razorpay_signature);
-          // Here you can redirect to success page if needed
-      },
-      "prefill": {
-          "name": customerName,
-          "email": customerEmail,
-          "contact": customerContact
-      },
-      "theme": {
-          "color": "#3399cc"
-      }
-    };
+    var options = {
+      "key": "rzp_test_R5CQyvERFSfKAl", // replace with your Razorpay Key
+      "amount": amount * 100,    // amount in paise
+      "currency": "INR",
+      "name": "True Vehicle",
+      "description": "Vehicle Purchase Transaction",
+      "order_id": orderId,
+      "handler": function (response){
+          alert("Payment ID: " + response.razorpay_payment_id);
+          alert("Order ID: " + response.razorpay_order_id);
+          alert("Signature: " + response.razorpay_signature);
+          
+          // This line navigates the browser back one step in history
+          window.history.back(); 
+      },
+      "prefill": {
+          "name": customerName,
+          "email": customerEmail,
+          "contact": customerContact
+      },
+      "theme": {
+          "color": "#3399cc"
+      }
+    };
 
-    var rzp1 = new Razorpay(options);
-    rzp1.open();
-  </script>
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+  </script>
 </body>
 </html>
