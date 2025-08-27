@@ -5,117 +5,108 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f4f7fb;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .container {
-      background: #fff;
-      padding: 30px 40px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      background: #f9fafb;
       text-align: center;
-      max-width: 420px;
+      padding: 50px;
     }
-
-    .success-icon {
-      font-size: 60px;
-      color: #4CAF50;
-      margin-bottom: 15px;
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-
-    h2 {
-      margin: 0;
-      color: #333;
-    }
-
-    p {
-      margin: 10px 0 0;
-      color: #555;
-      font-size: 14px;
-    }
-
-    .payment-id {
-      margin-top: 15px;
-      font-weight: bold;
-      color: #2a3f54;
-      background: #f1f5f9;
-      padding: 8px 12px;
+    .success, .failure {
+      margin-top: 20px;
+      padding: 15px;
       border-radius: 8px;
-      display: inline-block;
-      font-family: monospace;
     }
-
+    .success {
+      background: #e6ffed;
+      color: #065f46;
+    }
+    .failure {
+      background: #fee2e2;
+      color: #991b1b;
+    }
     .copy-btn {
       margin-top: 10px;
-      padding: 8px 16px;
+      padding: 8px 15px;
       border: none;
-      border-radius: 6px;
-      background: #4CAF50;
+      background: #4f46e5;
       color: #fff;
-      font-size: 14px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-
     .copy-btn:hover {
-      background: #43a047;
-    }
-
-    .instructions {
-      font-size: 13px;
-      color: #666;
-      background: #eef2f7;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      text-align: left;
+      background: #4338ca;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="payment-result">
-    <div class="instructions">
-      <strong>Instructions:</strong>
-      <ul>
-        <li>You will be redirected to Razorpay for secure payment.</li>
-        <li>Do not refresh or close the window during payment.</li>
-        <li>After success, copy the Payment ID for your future reference.</li>
-      </ul>
-    </div>
-    <p>Redirecting to payment...</p>
+  <div class="container" id="content">
+    <h2>Processing Payment...</h2>
+    <p>Please wait while we redirect you to Razorpay.</p>
   </div>
 
   <script>
-    const order_id = new URLSearchParams(window.location.search).get('order_id');
+    // Get parameters from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const order_id = urlParams.get('order_id');
+    const amount = urlParams.get('amount'); // in paise
+    const currency = urlParams.get('currency') || "INR";
+    const customer_name = urlParams.get('customer_name');
+    const customer_email = urlParams.get('customer_email');
+    const customer_contact = urlParams.get('customer_contact');
 
+    // Razorpay options
     var options = {
-        "key": "rzp_test_R5CQyvERFSfKAl",
-        "order_id": order_id,
-        "handler": function(response){
-            document.getElementById("payment-result").innerHTML = `
-                <div class="success-icon">✔</div>
-                <h2>Payment Successful!</h2>
-                <p>Your transaction was completed successfully.</p>
-                <div class="payment-id" id="paymentId">Payment ID: ${response.razorpay_payment_id}</div>
-                <button class="copy-btn" onclick="copyPaymentId()">Copy Payment ID</button>
-            `;
+      "key": "rzp_test_R5CQyvERFSfKAl",  // Replace with your Razorpay Key ID
+      "order_id": order_id,
+      "amount": amount,
+      "currency": currency,
+      "name": customer_name,
+      "description": "Payment Transaction",
+      "prefill": {
+        "name": customer_name,
+        "email": customer_email,
+        "contact": customer_contact
+      },
+      "handler": function (response) {
+        document.getElementById("content").innerHTML = `
+          <h2>Payment Successful 🎉</h2>
+          <div class="success">
+            <p><strong>Payment ID:</strong> <span id="paymentId">${response.razorpay_payment_id}</span></p>
+            <button class="copy-btn" onclick="copyPaymentId()">Copy Payment ID</button>
+          </div>
+          <p>Please save this Payment ID for future reference.</p>
+        `;
+      },
+      "modal": {
+        "ondismiss": function(){
+          document.getElementById("content").innerHTML = `
+            <h2>Payment Cancelled ❌</h2>
+            <div class="failure">
+              <p>You cancelled the transaction. No payment was made.</p>
+            </div>
+          `;
         }
+      },
+      "theme": {
+        "color": "#4f46e5"
+      }
     };
 
     var rzp = new Razorpay(options);
     rzp.open();
 
+    // Function to copy payment ID
     function copyPaymentId() {
-      const paymentText = document.getElementById("paymentId").innerText.replace("Payment ID: ", "");
-      navigator.clipboard.writeText(paymentText).then(() => {
-        alert("Payment ID copied to clipboard!.You can close this page");
+      var copyText = document.getElementById("paymentId").textContent;
+      navigator.clipboard.writeText(copyText).then(() => {
+        alert("Payment ID copied: " + copyText);
       });
     }
   </script>
